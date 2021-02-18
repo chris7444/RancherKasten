@@ -1,12 +1,45 @@
-# Rancher on vSphere and nimble
-  1) edit group_vars/all/vars.yml using the sample file
-  2) edit group_vars/all/vault.yml using the sample file
-  3) deploy RKE cluster with Rancher Server
-     $ ansible-playbook -i hosts site.yml
-  4) if you use the HPE Nimble CSI driver create a folder in your Nimble array default pool matching the name
-     of the user cluster. This name is specified with the environment variable USER_CLUSTER_TAG (see below)
-  5) deploy a user cluster with
-    $ export USER_CLUSTER_TAG=foo
-    $ ansible-playbook -i hosts user.yml
-    This will deploy a Rancher managed user cluster where nodes are named foo-mas<i> and foo-wrk<j> under the resource pool fooCluster. VMs are inventoried under a VM folder named fooCluster
+# Rancher on vSphere and HPE Nimble
+1.  Create the file `group_vars/all/vars.yml` based on the file `vars.yml.sample` in the same folder
 
+2.  Create the file `group_vars/all/vault.yml` using the sample file found in the same folder
+
+3.  Edit/Creates a file named `hosts` based on the sample Ansible inventory provided (`hosts.sample`)
+
+4.  Deploy an RKE cluster with Rancher Server
+
+   ```bash
+   $ ansible-playbook -i hosts site.yml
+   ```
+
+5. If you use the HPE Nimble CSI driver create a folder in your Nimble array default pool matching the name of the user cluster. This name is specified with the environment variable USER_CLUSTER_TAG (see below)
+
+6. Deploy the user cluster with the name foo (for example) using
+
+   ```bash
+   $ export USER_CLUSTER_TAG=foo
+   $ ansible-playbook -i hosts user.yml
+   ```
+
+If you want to access the apps you deploy in the Kubernetes clusters you will probably have to create wildcard DNS names in your DNS infra. They should point to a load balancer which distributes the traffic across the worker nodes.# Rancher on vSphere and HPE Nimble
+1.  Create the file `group_vars/all/vars.yml` based on the file `vars.yml.sample` in the same folder
+
+2.  Create the file `group_vars/all/vault.yml` using the sample file found in the same folder
+
+3.  Edit/Creates a file named `hosts` based on the sample Ansible inventory provided (`hosts.sample`)
+
+4.  Deploy an RKE cluster with Rancher Server
+
+   ```bash
+   $ ansible-playbook -i hosts site.yml
+   ```
+
+5. If you use the HPE Nimble CSI driver create a folder in your Nimble array default pool matching the name of the user cluster. This name is specified with the environment variable USER_CLUSTER_TAG (see below)
+
+6. Deploy the user cluster with the name foo (for example) using
+
+   ```bash
+   $ export USER_CLUSTER_TAG=foo
+   $ ansible-playbook -i hosts user.yml
+   ```
+
+If you want to access the apps you deploy in the Kubernetes clusters you will probably have to create wildcard DNS names in your DNS infra. They should point to a load balancer which distributes the traffic across the worker nodes.
