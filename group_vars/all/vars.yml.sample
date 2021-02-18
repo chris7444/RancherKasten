@@ -82,12 +82,12 @@ user_cluster:
   kubernetesVersion: v1.18.15-rancher1-1              # v1.19 does not work with the default/generated template
   csi:
     driver: nimble                                    # nimble, vsphere or none
-    vsphere:
+    vsphere:                                          # relevant if driver is vspehere
       datastore_name: vmfs1
       storageclass_name: vsphere
       datastore_size: 20
       is_default_class: "true"
-    nimble:
+    nimble:                                           # relevant if driver is nimble
       storageclass_name: nimble
       nimble_group: "16.78.21.159"
       user: admin                                     # password in vault.yml
