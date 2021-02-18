@@ -68,11 +68,11 @@
         datacenter: "/{{ datacenter }}"
         datastore: "/{{ datacenter }}/datastore/{{ datastore }}"
         diskSize: "{{ item.node_template.disk_size }}"
-        folder: "/{{ datacenter }}/vm/{{ user_folder }}"
+        folder: "/{{ datacenter }}/vm/{{ user_cluster.vcenter_folder }}"
         memorySize: "{{ item.node_template.memory_size }}"
         network:
           - "/{{ datacenter }}/network/{{ vm_portgroup }}"
-        pool: "/{{ datacenter }}/host/{{ vcenter_cluster }}/Resources/{{ user_folder }}"
+        pool: "/{{ datacenter }}/host/{{ vcenter_cluster }}/Resources/{{ user_cluster.vcenter_folder }}"
   register: res
   when: node_templates.json.data | count <= 0
 
