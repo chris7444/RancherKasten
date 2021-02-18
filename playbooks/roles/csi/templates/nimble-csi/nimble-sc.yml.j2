@@ -2,8 +2,8 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   annotations:
-    storageclass.kubernetes.io/is-default-class: "{{ csi.nimble.is_default_class }}"
-  name: {{ csi.nimble.storageclass_name }}
+    storageclass.kubernetes.io/is-default-class: "{{ user_cluster.csi.nimble.is_default_class }}"
+  name: {{ user_cluster.csi.nimble.storageclass_name }}
 provisioner: csi.hpe.com
 parameters:
   csi.storage.k8s.io/fstype: xfs
@@ -18,6 +18,6 @@ parameters:
   csi.storage.k8s.io/provisioner-secret-name: nimble-backend
   csi.storage.k8s.io/provisioner-secret-namespace: hpe-storage
   description: "Volume created with the HPE CSI Driver for Kubernetes"
-  folder: "{% if user_cluster.nimble_folder is defined %}{{ user_cluster.nimble_folder }}{% endif %}"
+  folder: "{% if user_cluster.csi.nimble.nimble_folder is defined %}{{ user_cluster.csi.nimble.nimble_folder }}{% endif %}"
 reclaimPolicy: Retain
 allowVolumeExpansion: true

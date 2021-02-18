@@ -43,12 +43,12 @@
   k8s_info:
     kubeconfig: "{{ uc_kube_config_file }}"
     kind: StorageClass
-    name: "{{ csi.vsphere.storageclass_name }}"
+    name: "{{ user_cluster.csi.vsphere.storageclass_name }}"
     validate_certs: true
   register: sc
 
 - debug:
-    msg: "Storage Class '{{ csi.vsphere.storageclass_name }}' already exists."
+    msg: "Storage Class '{{ user_cluster.csi.vsphere.storageclass_name }}' already exists."
   when: sc.resources | count > 0
 
 - block:
@@ -59,7 +59,7 @@
       username: '{{ vcenter_username }}'
       password: '{{ vcenter_password }}'
       datacenter_name: '{{ datacenter }}'
-      name: "{{ csi.vsphere.datastore_name | default(datastores[0]) }}"
+      name: "{{ user_cluster.csi.vsphere.datastore_name | default(datastores[0]) }}"
       validate_certs:  "{{ vcenter_validate_certs }}"
     delegate_to: localhost
     register: csi_datastore_info
@@ -72,6 +72,6 @@
       definition: "{{ lookup('template','vsphere-csi/csi-sc.yml.j2') }}"
 
   - debug:
-      msg: "Storage Class '{{ csi.vsphere.storageclass_name }}' Created"
+      msg: "Storage Class '{{ user_cluster.csi.vsphere.storageclass_name }}' Created"
 
   when: sc.resources | count < 1

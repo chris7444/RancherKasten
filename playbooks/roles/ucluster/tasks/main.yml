@@ -14,6 +14,7 @@
 # limitations under the License.
 ###
 ---
+- include_tasks: vcenter_preps.yml
 - include_tasks: token.yml
 - include_tasks: cloudcreds.yml
 - include_tasks: node_template.yml

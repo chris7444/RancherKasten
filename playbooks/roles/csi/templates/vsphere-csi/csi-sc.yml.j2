@@ -2,8 +2,8 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   annotations:
-    storageclass.kubernetes.io/is-default-class: "{{ csi.vsphere.is_default_class | default('false') }}"
-  name: "{{ csi.vsphere.storageclass_name }}"
+    storageclass.kubernetes.io/is-default-class: "{{ user_cluster.csi.vsphere.is_default_class | default('false') }}"
+  name: "{{ user_cluster.csi.vsphere.storageclass_name }}"
 parameters:
   datastoreurl: "{{ csi_datastore_info.datastores[0].url }}"
 provisioner: csi.vsphere.vmware.com

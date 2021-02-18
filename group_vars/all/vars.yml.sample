@@ -15,9 +15,12 @@
 ###
 ---
 
+
+usr_tag: "{% if lookup('env', 'USER_CLUSTER_TAG') == '' %}hpe{% else %}{{ lookup('env','USER_CLUSTER_TAG') }}{% endif %}"
+
 rancher_subnet: 10.5.61.0/24                       # subnet to use on the 'vm_portgroup' VLAN
 gateway: '10.5.61.1'                               # gateway for the above subnet (see your net admin)
-ntp_servers: ['10.5.61.1']                         # List of NTP servers
+ntp_servers: ['16.110.135.123']                    # List of NTP servers
 dns_servers: ['10.5.61.1']                         # list of DNS servers
 dns_suffixes: ['flab.local','hpe.org']             # list of DNS suffixes
 
@@ -25,9 +28,9 @@ dns_suffixes: ['flab.local','hpe.org']             # list of DNS suffixes
 # DHCP related settings
 #
 dhcp_subnet: 10.5.61.0/24                          # subnet to use on the above VLAN (see your net admin)
-dhcp_range: '10.5.61.40 10.5.61.100'              # DHCP range to use on the above VLAN 
-dhcp_default_lease_time: 86400                     # DHCP default lease time (24 hours)
-dhcp_max_lease_time: 2592000                       # DHCP maximum lease time (30 days)
+dhcp_range: '10.5.61.40 10.5.61.100'               # DHCP range to use on the above VLAN 
+dhcp_default_lease_time: 28800                     # DHCP default lease time (8 hours)
+dhcp_max_lease_time: 57600                         # DHCP maximum lease time (16 hours)
 domain_name: hpe.org                               # DNS domain name
 
 #
@@ -40,35 +43,19 @@ vcenter_validate_certs: false                             # true not implemented
 vcenter_cluster: dhci1                                    # Name of your SimpliVity Cluster (must exist)
 vm_portgroup: MGMT                                        # portgroup that the VMS connect to (must exist)
 datacenter: DHCI                                          # Name of your DATACENTER (must exist)
-datastore: hpeRancher                                     # Datastore where the VMs are landed
+datastore: vmw                                     # Datastore where the VMs are landed
 datastore_size: 1024                                      # size in GiB of the VM datastore
 cluster_name: hpe                                         # Name of the K8S Cluster. A VM folder with the same name is created if needed
 
 #
 # folders, templates and OVAs, templates are created using the corresponding OVA if they cannot be found (and only if they cannot be found)
 #
-user_folder: userCluster                                  # folder and pool name for the user cluster VMs, created if they are not found
 admin_folder: RancherInfra                                # Folder and pool name for Rancher Cluster VMs and  Templates
 #packer_os_flavor: ubuntu                                 # OS flavor of the template, can be ubuntu (default) or centos. case sensitive
 #
 # Public key to use for login in the rancher nodes (the VM hosting the Rancher Cluster)
 #
 ssh_key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDArNokIdAdYTP735ZJLhnbkhmHuRUQLZczLg8xX6AOFwiSEPvF7NX4FOTXHXJ/3T6QT94xl27i/F1hq+zJ110nWQlAAngWrtZpcwMdAL5kr5+M5WPOScH+v+xPy0pB5MC235h2YDGM9t/uh3IJ481Du53HgEJgdezX9p26LT/LcUIQHvjNFLYzDyp70M+K29vT+P/tKXOKIVIWf855feg6wEihQhId/8QvWQBK0FjkrDJGQbK79igOriltZzcI2/3XK0d556raOZqYxa/cVXT1Jd/QoniQurpDboC3x5EPJ3+EzTRl9OwukojZwqFnnWGIZL4/RDgA/FokuFUdryRjeodi4jdRXGCwoXKbL25fvH1ekxJzo+5GKXjT4HFPYb++bPjlcVaJP8UObAGGsLjFf3uikISH0e+8N1CCG+wwoeXtrR1FDL6iR1/+kWy5T95oK3JJAlQhzztWn7jlw2CB/OrAw3vLKhHWEKP/8DbeSQNNJ9PanyH+gE8AG8AR9pU= chris@ubuntu-01' 
-
-#
-# CSI Storage plugin
-#
-csi:
-  vsphere:
-    datastore_name: vmfs1
-    storageclass_name: vsphere
-    datastore_size: 20
-    is_default_class: "false"
-  nimble:
-    storageclass_name: nimble
-    nimble_group: "16.78.21.159" 
-    user: admin                                     # password in vault.yml
-    is_default_class: "true" 
 
 proxy:
   http:   "http://web-proxy.houston.hpecorp.net:8080/"     #  http:  "http://user:password@10.12.7.21:8080/"
@@ -91,39 +78,48 @@ rancher:
 #  tls_certkey_file: /home/alan/certs/tlskey.pem    # file containing the private key for the Rancher server
 
 user_cluster:
-#  vm_template: hpe-ubuntu-tpl     # an existing VM template, the admin template by default
-#  kubernetesVersion: v1.17.17-rancher1-1
-#  kubernetesVersion: v1.19.7-rancher1-1  # problems with firewalld, do no use
-  kubernetesVersion: v1.18.15-rancher1-1
-  name: clh                       # name of the user cluster
-  csi: nimble                     # nimble, vsphere or none
-  vcenter_credsname: mycreds      # only one vCenter cluster supported at this time
-  kasten_nfs_server: 16.78.15.15  # IP address of the NFS server
-  kasten_nfs_share_path: /nas/kasten-nfs  # name of NFS share where Kasten can export backup data
+  name: "{{ usr_tag }}"                               # name of the user cluster
+  kubernetesVersion: v1.18.15-rancher1-1              # v1.19 does not work with the default/generated template
+  csi:
+    driver: nimble                                    # nimble, vsphere or none
+    vsphere:
+      datastore_name: vmfs1
+      storageclass_name: vsphere
+      datastore_size: 20
+      is_default_class: "true"
+    nimble:
+      storageclass_name: nimble
+      nimble_group: "16.78.21.159"
+      user: admin                                     # password in vault.yml
+      is_default_class: "true"
+      nimble_folder: "{{ usr_tag }}"                  # you must create the folder in Nimble before running the playbook
+  vcenter_credsname: mycreds                          # only one vCenter cluster supported at this time
+  vcenter_folder: "{{ usr_tag }}Cluster"              # folder and pool name for the user cluster VMs
+  kasten_nfs_server: 16.78.15.15                      # IP address of the NFS server
+  kasten_nfs_share_path: "/nas/kasten-nfs"            # name of NFS share where Kasten can export backup data
   pools:
-   - name: clh-master-pool
+   - name: "{{ usr_tag }}-master-pool"
      etcd: true
      master: true
      worker: false
      count: 1
-     hostPrefix: clh-mas
+     hostPrefix: "{{ usr_tag }}-mas"
      node_template:
-       name: clh-master-node
+       name: "{{ usr_tag }}-master-node"
        cpu_count: 2
        disk_size: 20000
        memory_size: 8192
-   - name: clh-worker-pool
+   - name: "{{ usr_tag }}-worker-pool"
      etcd: false
      master: false
      worker: true
-     count: 1
-     hostPrefix: clh-wrk
+     count: 3
+     hostPrefix: "{{ usr_tag }}-wrk"
      node_template:
-       name: clh-worker-node
+       name: "{{ usr_tag }}-worker-node"
        cpu_count: 2
        disk_size: 40000
        memory_size: 4096
-
 
 #
 # Active Directory Integration

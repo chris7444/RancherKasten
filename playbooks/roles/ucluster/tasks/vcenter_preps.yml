@@ -14,42 +14,6 @@
 # limitations under the License.
 ### 
 
-- name: Configure Proxy
-  become: true
-  ini_file:
-    path: /etc/dnf/dnf.conf
-    section: main
-    option: proxy
-    value: "{{ proxy.https }}"
-    backup: yes
-  when:
-  - proxy is defined
-  - ansible_pkg_mgr == "dnf"
-
-- name: Install Required Packages
-  become: true
-  package:
-    name: "{{ packages }}"
-    state: latest
-  vars:
-    packages:
-    - genisoimage
-    
-- name: Verify Presence of Required files
-  stat:
-    path: "{{ item }}"
-  register: res
-  failed_when: res.stat.exists == false
-  with_items: "{{ prepare_required_files }}"
-
-- name: Install client tools
-  become: true
-  copy:
-    src: "{{ item }}"
-    dest: /usr/local/bin/
-    mode: u=rwx,g=rx,o=rx
-  with_items: "{{ prepare_client_tools }}"
-
 - name: create VM Folders
   vcenter_folder:
     hostname: "{{ vcenter_hostname }}"
@@ -61,7 +25,7 @@
     folder_type: vm
     state: present
   with_items:
-    - "{{ admin_folder }}"
+    - "{{ user_cluster.vcenter_folder }}"
 
 - name: Create Resource Pools
   vmware_resource_pool:
@@ -82,14 +46,4 @@
     cpu_expandable_reservations: yes
     state: present
   with_items:
-    - "{{ admin_folder }}"
-
-- name: Populate /etc/hosts
-  become: true
-  blockinfile:
-    path: /etc/hosts
-    block: |
-      {{ hostvars[item].ansible_host }} {{ hostvars[item].inventory_hostname }} {{ hostvars[item].inventory_hostname }}.{{ domain_name }}
-    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ hostvars[item].inventory_hostname }}"
-  with_items:
-  - "{{ groups['all'] | difference (groups.local) }}"
+    - "{{ user_cluster.vcenter_folder }}"

@@ -43,8 +43,8 @@
 - include_tasks: cpi.yml
 
 - include_tasks: vsphere_csi.yml
-  when: user_cluster.csi == "vsphere"
+  when: user_cluster.csi.driver == "vsphere"
 
 - include_tasks: nimble_csi.yml
-  when: user_cluster.csi == "nimble"
+  when: user_cluster.csi.driver == "nimble"
 

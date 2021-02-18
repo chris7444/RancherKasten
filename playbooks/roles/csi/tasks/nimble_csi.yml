@@ -79,12 +79,12 @@
   k8s_info:
     kubeconfig: "{{ uc_kube_config_file }}"
     kind: StorageClass
-    name: "{{ csi.nimble.storageclass_name }}"
+    name: "{{ user_cluster.csi.nimble.storageclass_name }}"
     validate_certs: true
   register: sc
 
 - debug:
-    msg: "Storage Class '{{ csi.nimble.storageclass_name }}' already exists."
+    msg: "Storage Class '{{ user_cluster.csi.nimble.storageclass_name }}' already exists."
   when: sc.resources | count > 0
 
 - name: Create Nimble Storage Class if necessary

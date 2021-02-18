@@ -15,7 +15,6 @@
 ###
 
 ---
-- import_playbook: playbooks/prepare.yml
 - import_playbook: playbooks/ucluster.yml
 - import_playbook: playbooks/csi.yml
 - import_playbook: playbooks/kasten.yml
