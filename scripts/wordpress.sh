@@ -31,7 +31,7 @@ kubectl get ns wordpress >/dev/null 2>&1 || kubectl create ns wordpress
 iamthere=$(helm ls -n wordpress  -f '^wordpress$' -q)
 if [[ $iamthere != "wordpress" ]]
 then
-  echo helm install wordpress bitnami/wordpress -n wordpress --set wordpressPassword="$1" --set wordpressUsername=admin
+  helm install wordpress bitnami/wordpress -n wordpress --set wordpressPassword="$1" --set wordpressUsername=admin
 else
   echo helm chart already installed
 fi
