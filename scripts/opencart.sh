@@ -11,27 +11,30 @@ fi
 domain=hpe.org
 
 #
-# Check syntax
+# Check Syntax
 #
 if (( $# != 1 ))
 then
   echo "usage: $0 password"
-  echo '  deploy wordpress with the specified password'
+  echo '  deploy opencart with the specified password'
   exit
 fi
 
 #
 # Create the Namespace
 #
-kubectl get ns wordpress >/dev/null 2>&1 || kubectl create ns wordpress
+kubectl get ns opencart >/dev/null 2>&1 || kubectl create ns opencart
 
 #
-# Deploy wordpress
+# Deploy opencart
 #
-iamthere=$(helm ls -n wordpress  -f '^wordpress$' -q)
-if [[ $iamthere != "wordpress" ]]
+iamthere=$(helm ls -n opencart  -f '^opencart$' -q)
+if [[ "$iamthere" != "opencart" ]]
 then
-  echo helm install wordpress bitnami/wordpress -n wordpress --set wordpressPassword="$1" --set wordpressUsername=admin
+  helm install opencart bitnami/opencart -n opencart \
+        --set opencartHost=opencart.${cluster}.${domain} \
+        --set opencartPassword="$1" \
+        --set opencartUsername=admin
 else
   echo helm chart already installed
 fi
@@ -44,19 +47,19 @@ cat <<EOF >${manifest}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: wordpress
-  namespace: wordpress
+  name: opencart
+  namespace: opencart
 spec:
   rules:
-  - host: wordpress.${cluster}.${domain}
+  - host: opencart.${cluster}.${domain}
     http:
       paths:
       - backend:
-          serviceName: wordpress
+          serviceName: opencart
           servicePort: 80
         path: /
         pathType: Prefix
 EOF
 kubectl apply -f ${manifest}
 unlink ${manifest}
-kubectl get ingress wordpress -n wordpress
+kubectl get ingress opencart -n opencart
