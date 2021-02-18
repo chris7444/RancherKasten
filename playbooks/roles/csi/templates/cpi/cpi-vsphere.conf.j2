@@ -1,0 +1,11 @@
+global:
+  port: 443
+  insecureFlag: true
+
+vcenter:
+  tenant-production:
+    server: "{{ vcenter_hostname }}"
+    secretName: cpi-vsphere-secret
+    secretNamespace: kube-system
+    datacenters:
+    - "{{ datacenter }}"

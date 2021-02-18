@@ -1,0 +1,2 @@
+kasten_nfs_server: "{{ user_cluster.kasten_nfs_server | default(hostvars[groups['support'][0]].ansible_host) }}"
+kasten_nfs_share_path: "{{ user_cluster.kasten_nfs_share_path | default('share2') }}"

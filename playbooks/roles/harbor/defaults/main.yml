@@ -1,0 +1,23 @@
+###
+# Copyright (2020) Hewlett Packard Enterprise Development LP
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# You may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+###
+---
+harbor_tls_cacert_file: "{{ registry.tls_cacert_file | default(default_registry_tls_cacert_file) }}"
+harbor_tls_servercert_file: "{{ registry.tls_certchain_file | default(default_registry_tls_servercert_file) }}"
+harbor_tls_serverkey_file: "{{ registry.tls_certkey_file | default(default_registry_tls_serverkey_file) }}"
+harbor_fqdn: "{{ registry.fqdn | default(default_registry_fqdn) }}"
+harbor_projects: "{{ registry.projects | default('[]') }}"
+harbor_users: "{{ registry.users | default('[]') }}"
+harbor_api_timeout: 300 # Wait a maximum if 300 seconds for the Harbor API

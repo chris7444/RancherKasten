@@ -1,0 +1,58 @@
+###
+# Copyright (2020) Hewlett Packard Enterprise Development LP
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# You may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+### 
+---
+
+- name: Create CPI Config Map
+  k8s:
+    state: present
+    validate_certs: true
+    kubeconfig: "{{ uc_kube_config_file }}"
+    definition:
+      kind: ConfigMap
+      apiVersion: v1
+      metadata:
+        name: cloud-config
+        namespace: kube-system
+      data:
+        vsphere.conf: "{{ lookup('template', 'cpi/cpi-vsphere.conf.j2') }}"
+
+- name: Create CPI Secret
+  k8s:
+    state: present
+    validate_certs: true
+    kubeconfig: "{{ uc_kube_config_file }}"
+    definition: "{{ lookup('template', 'cpi/cpi-vsphere-secret.conf.j2') }}"
+
+- name: Create Cloud Controller Manager Roles
+  k8s:
+    state: present
+    validate_certs: true
+    kubeconfig: "{{ uc_kube_config_file }}"
+    definition: "{{ lookup('template', 'cpi/cloud-controller-manager-roles.yaml') }}"
+
+- name: Create Cloud Controller Manager Role Bindings
+  k8s:
+    state: present
+    validate_certs: true
+    kubeconfig: "{{ uc_kube_config_file }}"
+    definition: "{{ lookup('template', 'cpi/cloud-controller-manager-role-bindings.yaml') }}"
+
+- name: Create Cloud Controller Manager DaemonSet
+  k8s:
+    state: present
+    validate_certs: true
+    kubeconfig: "{{ uc_kube_config_file }}"
+    definition: "{{ lookup('template', 'cpi/vsphere-cloud-controller-manager-ds.yaml') }}"

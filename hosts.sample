@@ -1,0 +1,18 @@
+[local]
+localhost            ansible_connection=local 
+
+[support]
+hpe-support1         ansible_host=10.5.61.11
+
+[loadbalancer]
+hpe-lb1              ansible_host=10.5.61.12 api_int_preferred=true
+hpe-lb2              ansible_host=10.5.61.13
+
+#machines hosting Rancher Cluster
+[ranchernodes]
+hpe-rke1             ansible_host=10.5.61.14
+hpe-rke2             ansible_host=10.5.61.15
+hpe-rke3             ansible_host=10.5.61.16
+
+[template]
+hpe-ubuntu-tpl       ansible_host=10.5.61.17

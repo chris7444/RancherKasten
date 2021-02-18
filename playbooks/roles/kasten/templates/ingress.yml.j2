@@ -1,0 +1,15 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: kasten
+  namespace: kasten-io
+spec:
+  rules:
+  - host: kasten.{{ user_cluster.name }}.hpe.org
+    http:
+      paths:
+      - backend:
+          serviceName: gateway
+          servicePort: 8000
+        path: /
+        pathType: Prefix

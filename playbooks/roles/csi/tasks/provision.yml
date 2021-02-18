@@ -1,0 +1,50 @@
+###
+# Copyright (2020) Hewlett Packard Enterprise Development LP
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# You may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+### 
+---
+- name: Retrieve User Cluster ID
+  uri:
+    url:  "{{ rancher.url }}/{{ rancher.apiversion }}/clusters?name={{ user_cluster.name }}"
+    validate_certs: "{{ rancher.validate_certs }}"
+    headers:
+      Accept: application/json
+      Content-Type: application/json
+      Authorization: Bearer {{ bearer_token }}
+    method: GET
+    timeout: 4
+    status_code:
+    - 200
+  register: res
+
+- set_fact:
+    uc_kube_config_file: "{{ install_dir }}/kube_config.{{ user_cluster.name }}"
+
+- name: Verify Presence of the kubeconfig file
+  stat:
+    path: "{{ uc_kube_config_file }}"
+  register: res
+
+- fail:
+    msg: "Cannot find the kubeconfig file {{ uc_kube_config_file }} for cluster {{ user_cluster.name }}"
+  when: not res.stat.exists
+
+- include_tasks: cpi.yml
+
+- include_tasks: vsphere_csi.yml
+  when: user_cluster.csi == "vsphere"
+
+- include_tasks: nimble_csi.yml
+  when: user_cluster.csi == "nimble"
+

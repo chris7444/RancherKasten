@@ -1,0 +1,126 @@
+###
+# Copyright (2020) Hewlett Packard Enterprise Development LP
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# You may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+### 
+---
+
+- set_fact:
+    env:
+      KUBECONFIG: "{{ uc_kube_config_file }}"
+  when: proxy is not defined
+
+- set_fact:
+    env:
+      KUBECONFIG: "{{ uc_kube_config_file }}"
+      http_proxy: "{{ proxy.http }}"
+      https_proxy: "{{ proxy.http }}"
+      no_proxy: "{{ proxy.except }}"
+  when: proxy is defined
+
+- name: Create the Config file for the Nimble helm chart
+  template:
+    src: nimble-csi/nimble-helm-chart-values.j2
+    dest: "{{ install_dir }}/nimble-helm-chart-values.txt"
+
+- name: Add the helm repository
+  shell: |
+   helm repo add hpe-storage https://hpe-storage.github.io/co-deployments/
+  environment: "{{ env }}"
+
+- name: Update the Helm cache
+  shell : |
+    helm repo update
+  environment: "{{ env }}"
+
+- name: Create Namespace hpe-storage
+  k8s:
+    state: present
+    definition:
+      kind: Namespace
+      apiVersion: v1
+      metadata:
+        name: hpe-storage
+  environment: "{{ env }}"
+
+- name: See if the nimble chart is already installed
+  shell: |
+     helm -n hpe-storage ls -f hpe-csi-driver -q
+  register: res
+  environment: "{{ env }}"
+
+- name: Install the Nimble CSI storage driver if necessary
+  shell: |
+    helm install hpe-csi-driver hpe-storage/hpe-csi-driver \
+      --namespace hpe-storage \
+      --values {{ install_dir }}/nimble-helm-chart-values.txt
+  when: res.stdout_lines | count <= 0
+  environment: "{{ env }}"
+
+
+- name: Create Secret for Storage Backend
+  k8s:
+    state: present
+    validate_certs: true
+    kubeconfig: "{{ uc_kube_config_file }}"
+    definition: "{{ lookup('template','nimble-csi/nimble-backend.yml.j2') }}"
+
+- name: See if the CSI Storage Class exists
+  k8s_info:
+    kubeconfig: "{{ uc_kube_config_file }}"
+    kind: StorageClass
+    name: "{{ csi.nimble.storageclass_name }}"
+    validate_certs: true
+  register: sc
+
+- debug:
+    msg: "Storage Class '{{ csi.nimble.storageclass_name }}' already exists."
+  when: sc.resources | count > 0
+
+- name: Create Nimble Storage Class if necessary
+  k8s:
+    state: present
+    validate_certs: true
+    kubeconfig: "{{ uc_kube_config_file }}"
+    definition: "{{ lookup('template','nimble-csi/nimble-sc.yml.j2') }}"
+  when: sc.resources | count < 1
+
+- name: Define External Snapshotter required CRDs
+  k8s:
+    state: present
+    validate_certs: true
+    kubeconfig: "{{ uc_kube_config_file }}"
+    definition: "{{ lookup('file', item) }}" 
+  with_items:
+  - external-snapshotter/release-3.0/crd/snapshot.storage.k8s.io_volumesnapshotclasses.yaml
+  - external-snapshotter/release-3.0/crd/snapshot.storage.k8s.io_volumesnapshotcontents.yaml
+  - external-snapshotter/release-3.0/crd/snapshot.storage.k8s.io_volumesnapshots.yaml
+
+- name: Deploy the snapshot controller
+  k8s:
+    state: present
+    validate_certs: true
+    kubeconfig: "{{ uc_kube_config_file }}"
+    definition: "{{ lookup('file', item) }}" 
+  with_items:
+  - external-snapshotter/release-3.0/snapshot-controller/rbac-snapshot-controller.yaml
+  - external-snapshotter/release-3.0/snapshot-controller/setup-snapshot-controller.yaml
+
+- name: Create a Snapshot class
+  k8s:
+    state: present
+    validate_certs: true
+    kubeconfig: "{{ uc_kube_config_file }}"
+    definition: "{{ lookup('file', item) }}" 
+  with_items:
+  - nimble/snapshotclass.yml

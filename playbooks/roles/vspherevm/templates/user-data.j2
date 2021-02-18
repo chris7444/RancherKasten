@@ -1,0 +1,19 @@
+#cloud-config
+
+users:
+  - name: {{ ansible_user }}
+    gecos: HPE Rancher on SimpliVity ansible account
+    lock-passwd: true
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+      - {{ ssh_key }}
+ntp:
+  enabled: true
+  servers: {{ ntp_servers }}
+
+ca-certs:
+  trusted:
+{% for ca in additional_cas %}
+  - |
+    {{ lookup('file',ca) | indent(width=4, indentfirst=false) }}
+{% endfor %}
