@@ -60,7 +60,7 @@ ssh_key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDArNokIdAdYTP735ZJLhnbkhmHuRUQLZ
 proxy:
   http:   "http://web-proxy.houston.hpecorp.net:8080/"     #  http:  "http://user:password@10.12.7.21:8080/"
   https:  "http://web-proxy.houston.hpecorp.net:8080/"
-  except: "localhost,.hpe.org,10.0.0.0/8,.cluster.local"
+  except: "127.0.0.1,localhost,.hpe.org,10.0.0.0/8,.flab.local,.svc,.cluster.local"
 
 rancher:
   url: https://rancher.hpe.org    # this the FQDN at which Rancher Server can be reached
@@ -113,13 +113,13 @@ user_cluster:
      etcd: false
      master: false
      worker: true
-     count: 3
+     count: 1
      hostPrefix: "{{ usr_tag }}-wrk"
      node_template:
        name: "{{ usr_tag }}-worker-node"
-       cpu_count: 2
+       cpu_count: 4
        disk_size: 40000
-       memory_size: 4096
+       memory_size: 8192
 
 #
 # Active Directory Integration
