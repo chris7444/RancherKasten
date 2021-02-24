@@ -1,0 +1,57 @@
+- name: Copy minio to "{{ inventory_hostname }}"
+  become: true
+  copy:
+    src: "{{ kits_bom.minio.target }}"
+    dest: /usr/local/bin/minio
+    mode: 0771
+
+- name: Ensure group minio exists
+  become: true
+  ansible.builtin.group:
+    name: minio
+    state: present
+    system: yes  
+
+- name: Ensure user minio exists
+  become: true
+  ansible.builtin.user:
+    name: minio
+    comment: Minio Service Account
+    group: minio
+    system: yes
+    state: present  
+
+- name: Create volumes directory
+  become: true
+  file:
+    path: /home/minio/volumes
+    state: directory
+    mode: 0755
+    owner: minio
+    group: minio
+
+- name: Create systemd service file
+  become: true
+  notify: Restart minio
+  template:
+    src: minio.service.j2
+    dest: /etc/systemd/system/minio.service
+
+- name: Create default file for minio
+  become: true
+  notify: Restart minio
+  template:
+    src: minio.default.j2
+    dest: /etc/default/minio
+
+- name: Configure required ports in public zone
+  become: true
+  firewalld:
+    zone: public
+    port: "{{ item }}"
+    immediate: yes
+    permanent: yes
+    state: enabled
+  with_items:
+   - 9000/tcp
+

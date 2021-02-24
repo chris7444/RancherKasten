@@ -54,6 +54,11 @@ os_iso: "{% if packer_os_flavor is defined and packer_os_flavor == 'centos' %}{{
 
 
 kits_bom:
+  minio:
+    url: "https://dl.minio.io/server/minio/release/linux-amd64/minio.RELEASE.2021-02-23T20-05-01Z"
+    hash: "sha256:9e59314f7364da8424ff6a9a5fabd44906af464dfbb262e00722c497646dfe40"
+    target: "{{ kits_folder }}/minio.RELEASE.2021-02-23T20-05-01Z"
+
   nginxplus:
     url: "https://github.com/nginxinc/kubernetes-ingress/archive/{{ kits_nginxplus_version }}.tar.gz"
     hash: "sha256:e0087bb32162ce0545a3a02a0e9e4d69e8339ddb563c60ab1883f52fc75b3028"        # checksum for v1.7.2

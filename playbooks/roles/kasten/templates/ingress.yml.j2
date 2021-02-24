@@ -3,6 +3,8 @@ kind: Ingress
 metadata:
   name: kasten
   namespace: kasten-io
+  annotations:
+    nginx.ingress.kubernetes.io/app-root: /k10/#
 spec:
   rules:
   - host: kasten.{{ user_cluster.name }}.hpe.org
