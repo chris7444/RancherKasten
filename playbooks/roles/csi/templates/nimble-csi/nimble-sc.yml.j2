@@ -19,5 +19,6 @@ parameters:
   csi.storage.k8s.io/provisioner-secret-namespace: hpe-storage
   description: "Volume created with the HPE CSI Driver for Kubernetes"
   folder: "{% if user_cluster.csi.nimble.nimble_folder is defined %}{{ user_cluster.csi.nimble.nimble_folder }}{% endif %}"
+#  destroyOnDelete: "true"
 reclaimPolicy: Retain
 allowVolumeExpansion: true
