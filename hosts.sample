@@ -1,18 +1,20 @@
 [local]
-localhost            ansible_connection=local 
+localhost                ansible_connection=local 
 
 [support]
-hpe-support1         ansible_host=10.5.61.11 minio=true
+rancher-support1         ansible_host=16.78.21.177 minio=true # dhcp=true define dhcp if you have a DHCP free VLAN for Rancher
 
 [loadbalancer]
-hpe-lb1              ansible_host=10.5.61.12 api_int_preferred=true
-hpe-lb2              ansible_host=10.5.61.13
+rancher-lb1              ansible_host=16.78.21.178 api_int_preferred=true
+rancher-lb2              ansible_host=16.78.21.179
+#                                 vip 16.78.21.180 see group_vars/all/vars.yml
 
 #machines hosting Rancher Cluster
 [ranchernodes]
-hpe-rke1             ansible_host=10.5.61.14
-hpe-rke2             ansible_host=10.5.61.15
-hpe-rke3             ansible_host=10.5.61.16
+rancher-rke1             ansible_host=16.78.21.181
+rancher-rke2             ansible_host=16.78.21.182
+rancher-rke3             ansible_host=16.78.21.183
 
 [template]
-hpe-ubuntu-tpl       ansible_host=10.5.61.17
+rancher-ubuntu-tpl       ansible_host=16.78.21.184
+

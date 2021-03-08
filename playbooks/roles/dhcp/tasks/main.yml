@@ -16,10 +16,14 @@
 ---
 
 - include_tasks: provision.yml
-  when: provision is defined
+  when:
+  - provision is defined
+  - hostvars[inventory_hostname].dhcp is defined
 
 - include_tasks: configure.yml
-  when: configure is defined
+  when: 
+  - hostvars[inventory_hostname].dhcp is defined
+  - configure is defined
 
 - include_tasks: poweron.yml
   when: poweron is defined

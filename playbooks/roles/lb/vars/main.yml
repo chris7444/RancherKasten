@@ -14,4 +14,4 @@
 # limitations under the License.
 ###
 ---
-loadbalancers_backend_interface: ansible0
+loadbalancers_backend_interface: "{{ rancher_iface }}"

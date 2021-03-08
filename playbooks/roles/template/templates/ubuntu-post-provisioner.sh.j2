@@ -20,11 +20,11 @@ apt-get -y autoremove
 
 rm /etc/netplan/*
 cat <<EOF >/etc/netplan/50-cloud-init.yaml
-network:
-    ethernets:
-        enp0s3:
-            dhcp4: true
-    version: 2
+#network:
+#    ethernets:
+#        enp0s3:
+#            dhcp4: true
+#    version: 2
 EOF
 
 #

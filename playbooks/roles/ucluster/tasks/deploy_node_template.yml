@@ -60,7 +60,7 @@
         cfgparam:
           - "disk.enableUUID=TRUE"
         cloneFrom: "/{{ datacenter }}/vm/{{ admin_folder }}/{{ vm_template }}"
-        creationType: vm
+        creationType: template
         cloudConfig: "{{ lookup('template','cloud-config.j2') }}"
         cloudinit: ""
         cpuCount: "{{item.node_template.cpu_count }}"
@@ -72,7 +72,18 @@
         memorySize: "{{ item.node_template.memory_size }}"
         network:
           - "/{{ datacenter }}/network/{{ vm_portgroup }}"
+          - "/{{ datacenter }}/network/{{ iscsi2_portgroup }}"
         pool: "/{{ datacenter }}/host/{{ vcenter_cluster }}/Resources/{{ user_cluster.vcenter_folder }}"
+        vappIpallocationpolicy: "fixedAllocated"
+        vappIpprotocol: "IPv4"
+        vappTransport: "com.vmware.guestInfo"
+        vappProperty:
+          - "guestinfo.interface.0.ip.0.address=ip:{{ vm_portgroup }}"
+          - "guestinfo.interface.0.ip.0.netmask=${netmask:{{ vm_portgroup }}}"
+          - "guestinfo.interface.0.route.0.gateway=${gateway:{{ vm_portgroup }}}"
+          - "guestinfo.dns.servers=${dns:{{ vm_portgroup }}}"
+          - "guestinfo.interface.1.ip.0.address=ip:{{ iscsi2_portgroup }}"
+          - "guestinfo.interface.1.ip.0.netmask=${netmask:{{ iscsi2_portgroup }}}"
   register: res
   when: node_templates.json.data | count <= 0
 

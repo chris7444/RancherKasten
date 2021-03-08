@@ -11,6 +11,56 @@ apt:
   http_proxy: {{ proxy.http }}
   https_proxy: {{ proxy.https }}
 write_files:
+- path: /root/confignet.sh
+  content: |
+    #!/bin/bash
+    mask2cidr() {
+        nbits=0
+        IFS=.
+        for dec in $1 ; do
+            case $dec in
+                255) let nbits+=8;;
+                254) let nbits+=7;;
+                252) let nbits+=6;;
+                248) let nbits+=5;;
+                240) let nbits+=4;;
+                224) let nbits+=3;;
+                192) let nbits+=2;;
+                128) let nbits+=1;;
+                0);;
+                *) echo "Error: $dec is not recognised"; exit 1
+            esac
+        done
+        echo "$nbits"
+    }
+    vmtoolsd --cmd 'info-get guestinfo.ovfEnv' > /tmp/ovfenv
+    IPAddress=$(sed -n 's/.*Property oe:key="guestinfo.interface.0.ip.0.address" oe:value="\([^"]*\).*/\1/p' /tmp/ovfenv)
+    SubnetMask=$(sed -n 's/.*Property oe:key="guestinfo.interface.0.ip.0.netmask" oe:value="\([^"]*\).*/\1/p' /tmp/ovfenv)
+    Gateway=$(sed -n 's/.*Property oe:key="guestinfo.interface.0.route.0.gateway" oe:value="\([^"]*\).*/\1/p' /tmp/ovfenv)
+    DNS=$(sed -n 's/.*Property oe:key="guestinfo.dns.servers" oe:value="\([^"]*\).*/\1/p' /tmp/ovfenv)
+
+    IPAddress2=$(sed -n 's/.*Property oe:key="guestinfo.interface.1.ip.0.address" oe:value="\([^"]*\).*/\1/p' /tmp/ovfenv)
+    SubnetMask2=$(sed -n 's/.*Property oe:key="guestinfo.interface.1.ip.0.netmask" oe:value="\([^"]*\).*/\1/p' /tmp/ovfenv)
+    prefix1=$(mask2cidr $SubnetMask)
+    prefix2=$(mask2cidr $SubnetMask2)
+ 
+    cat > /etc/netplan/50-cloud-init.yaml <<EOF
+    network:
+      version: 2
+      renderer: networkd
+      ethernets:
+        {{ rancher_iface }}:
+          addresses: 
+            - $IPAddress/$prefix1
+          gateway4: $Gateway
+          nameservers:
+            addresses : [$DNS]
+        {{ iscsi2_iface }}:
+          mtu: 9000
+          addresses: 
+            - $IPAddress2/$prefix2
+    EOF
+    sudo netplan apply
 - path: /etc/environment
   owner: root:root
   content: |
@@ -28,3 +78,6 @@ ca-certs:
   - |
     {{ lookup('file',ca) | indent(width=4, indentfirst=false) }}
 {% endfor %}
+
+runcmd:
+- bash /root/confignet.sh
