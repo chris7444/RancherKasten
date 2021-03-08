@@ -21,14 +21,14 @@
     system: yes
     state: present  
 
-- name: Create volumes directory
-  become: true
-  file:
-    path: /home/minio/volumes
-    state: directory
-    mode: 0755
-    owner: minio
-    group: minio
+#- name: Create volumes directory
+#  become: true
+#  file:
+#    path: /home/minio/volumes
+#    state: directory
+#    mode: 0755
+#    owner: minio
+#    group: minio
 
 - name: Create systemd service file
   become: true
