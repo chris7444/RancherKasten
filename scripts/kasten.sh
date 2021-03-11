@@ -4,7 +4,7 @@
 #
 . ~/proxy.rc
 cluster=$(kubectl config current-context)
-domain=hpe.org
+domain=k8s.org
 version="--version=2.5.25"
 
 #

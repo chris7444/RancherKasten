@@ -8,7 +8,7 @@ if [[ $? != 0 ]]
 then
    echo Make sure KUBECONFIG points to a valid kubeconfig file
 fi
-domain=hpe.org
+domain=k8s.org
 
 #
 # Check Syntax
