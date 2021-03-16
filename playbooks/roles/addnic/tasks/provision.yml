@@ -1,0 +1,64 @@
+###
+# Copyright (2020) Hewlett Packard Enterprise Development LP
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# You may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+### 
+---
+#
+# Adjust VM networking.
+#  - I would have preferred to use vmware_guest_network to only configure one network but this module has too many isssues
+#  - using instead vmware_guest but if the VMs are not using the vm_portgroup network, this may break the configuration
+#
+- name: Reconfigure VM
+  delegate_to: localhost
+  vmware_guest:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    validate_certs: "{{ vcenter_validate_certs }}"
+    cluster: "{{ vcenter_cluster }}"
+    datacenter: "{{ datacenter }}"
+    uuid: "{{ uuid }}"
+    state: present
+    networks:
+    - name: "{{ vm_portgroup }}"
+    - name: "{{ iscsi1_portgroup }}"
+  vars:
+    uuid: "{{ item.json.providerId.split('/')[2] }}"
+  with_items: "{{ node_details.results }}"
+  loop_control:
+    label: "{{ item.json.hostname }}"
+
+#
+# Configure the iSCSI interface(s)
+#
+- name: Build the iSCSI network configuration script
+  delegate_to: "{{ item.item.address }}"
+  template:
+    src: config-iscsi1.sh.j2
+    dest: config-iscsi1.sh
+  with_items: "{{ node_details.results }}"
+  loop_control:
+    label: "{{ item.json.hostname }}"
+  register: res
+
+- name: Configure the iSCSI network
+  delegate_to: "{{ item.item.address }}"
+  become: true
+  shell: |
+    bash config-iscsi1.sh
+  with_items: "{{ node_details.results }}"
+  loop_control:
+    label: "{{ item.json.hostname }}"
+  register: res
+

@@ -27,7 +27,7 @@ esxi_host: ''
 # name of the ansible/backend interface as seen be the OS
 #
 rancher_iface: ens192
-iscsi2_iface: ens224
+iscsi1_iface: ens224
 
 #
 #

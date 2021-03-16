@@ -43,7 +43,7 @@ datacenter: DHCI                                          # Name of your DATACEN
 datastore: vmfs2                                          # Datastore where the VMs are landed (must exist)
 datastore_size: 1024                                      # size in GiB of the VM datastore
 cluster_name: rke                                         # Name of the K8S Cluster. A VM folder with the same name is created if needed
-iscsi2_portgroup: iSCSI2
+iscsi1_portgroup: iSCSI2
 
 #
 # folders, templates and OVAs, templates are created using the corresponding OVA if they cannot be found (and only if they cannot be found)
@@ -75,7 +75,7 @@ rancher:
 #  tls_certchain_file: /home/alan/certs/cachain.pem # file containing the server certificate followed by the intermediate CA certs (if any)
 #  tls_certkey_file: /home/alan/certs/tlskey.pem    # file containing the private key for the Rancher server
 
-usr_tag: "{% if lookup('env', 'USER_CLUSTER_TAG') == '' %}src{% else %}{{ lookup('env','USER_CLUSTER_TAG') }}{% endif %}"
+usr_tag: "{% if lookup('env', 'USER_CLUSTER_TAG') == '' %}dev{% else %}{{ lookup('env','USER_CLUSTER_TAG') }}{% endif %}"
 user_cluster:
   name: "{{ usr_tag }}"                               # name of the user cluster
 # vm_template: kas-iscsi2-tpl                         # the default VM template is the admin template
@@ -83,7 +83,7 @@ user_cluster:
   csi:
     driver: nimble                                    # nimble, vsphere or none
     vsphere:                                          # relevant if driver is vspehere
-      datastore_name: vmfs2                           # must exist
+      datastore_name: cnstests                        # must exist
       storageclass_name: vsphere
       datastore_size: 20
       is_default_class: "true"
