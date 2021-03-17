@@ -15,6 +15,31 @@
 ###
 
 ---
+- name: Define vAPP properties
+  set_fact:
+    vapp_properties:
+    - "guestinfo.interface.0.ip.0.address=ip:{{ vm_portgroup }}"
+    - "guestinfo.interface.0.ip.0.netmask=${netmask:{{ vm_portgroup }}}"
+    - "guestinfo.interface.0.route.0.gateway=${gateway:{{ vm_portgroup }}}"
+    - "guestinfo.dns.servers=${dns:{{ vm_portgroup }}}"
+    iscsi1_guestinfo_additions:
+    - "guestinfo.interface.1.ip.0.address=ip:{{ iscsi1_portgroup | default('undefined') }}"
+    - "guestinfo.interface.1.ip.0.netmask=${netmask:{{ iscsi1_portgroup | default('undefined') }}}"
+    iscsi2_guestinfo_additions:
+    - "guestinfo.interface.2.ip.0.address=ip:{{ iscsi2_portgroup | default('undefined') }}"
+    - "guestinfo.interface.2.ip.0.netmask=${netmask:{{ iscsi2_portgroup | default('undefined') }}}"
+
+- name: Adjust vApp Properties for optional iSCSI network
+  set_fact:
+    vapp_properties: "{{ vapp_properties + iscsi1_guestinfo_additions }}"
+  when: iscsi1_portgroup is defined
+
+- name: Adjust vApp Properties for optional 2nd iSCSI network
+  set_fact:
+    vapp_properties: "{{ vapp_properties + iscsi2_guestinfo_additions }}"
+  when: iscsi2_portgroup is defined
+
+- debug: var=vapp_properties
 
 - name: See if the node template is already existing
   uri:
@@ -76,13 +101,7 @@
         vappIpallocationpolicy: "fixedAllocated"
         vappIpprotocol: "IPv4"
         vappTransport: "com.vmware.guestInfo"
-        vappProperty:
-          - "guestinfo.interface.0.ip.0.address=ip:{{ vm_portgroup }}"
-          - "guestinfo.interface.0.ip.0.netmask=${netmask:{{ vm_portgroup }}}"
-          - "guestinfo.interface.0.route.0.gateway=${gateway:{{ vm_portgroup }}}"
-          - "guestinfo.dns.servers=${dns:{{ vm_portgroup }}}"
-          - "guestinfo.interface.1.ip.0.address=ip:{{ iscsi1_portgroup }}"
-          - "guestinfo.interface.1.ip.0.netmask=${netmask:{{ iscsi1_portgroup }}}"
+        vappProperty: "{{ vapp_properties }}"
   register: res
   when: node_templates.json.data | count <= 0
 
