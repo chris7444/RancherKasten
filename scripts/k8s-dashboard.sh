@@ -42,4 +42,4 @@ kubectl apply -f ${manifest}
 unlink ${manifest}
 
 echo use the following token to log in in the k8s dashboard
-cat ~/.svtrancher/kube_config.clh | awk '/ token:/ {print $2}'
+cat $KUBECONFIG | awk '/ token:/ {print $2}'
