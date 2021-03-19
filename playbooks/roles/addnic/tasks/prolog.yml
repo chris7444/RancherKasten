@@ -25,7 +25,7 @@
 
 - include_vars: "{{ install_dir }}/rancher-token"
 
-- name: See if the user cluster is already deployed
+- name: Find the user cluster
   uri:
     url: "{{ rancher.url }}/{{ rancher.apiversion }}/clusters?name={{ user_cluster.name }}"
     validate_certs: "{{ rancher.validate_certs }}"
@@ -39,14 +39,38 @@
     - 200
     body_format: form-urlencoded
   register: clusters
-- fail:
+
+- name: Fail if cluster was not found
+  fail:
     msg: "Cannot find the cluster named {{ user_cluster.name }}"
   when: clusters.json.data | count == 0
 
-- set_fact:
+- name: Wait until all nodes are deployed (timeout after {{ addnic_wait_for_nodes_ready / 60 }} mns)
+  uri:
+    url: "{{ rancher.url }}/{{ rancher.apiversion }}/clusters?name={{ user_cluster.name }}"
+    validate_certs: "{{ rancher.validate_certs }}"
+    headers:
+      Accept: application/json
+      Content-Type: application/json
+      Authorization: Bearer {{ bearer_token }}
+    method: GET
+    timeout: 4
+    status_code:
+    - 200
+    body_format: form-urlencoded
+  register: clusters
+  vars:
+    target: "{{ clusters.json.data[0].nodeCount }}"
+    wanted: "{{ clusters.json.data[0].appliedSpec.rancherKubernetesEngineConfig.nodes | count }}"
+  until: target == wanted
+  retries: "{{ ( addnic_wait_for_nodes_ready / 5 ) | int }}"
+  delay: 5
+
+- name: memorize the list of nodes
+  set_fact:
     nodes="{{ clusters.json.data[0].appliedSpec.rancherKubernetesEngineConfig.nodes }}"
 
-- name: Process Node
+- name: Wait a maximum of {{ addnic_wait_for_nodes_ready / 60 }} mns for all nodes to be ready
   uri:
     url: "{{ rancher.url }}/{{ rancher.apiversion }}/nodes/{{ item.nodeId }}"
     validate_certs: "{{ rancher.validate_certs }}"
@@ -59,5 +83,13 @@
     status_code:
     - 200
     body_format: form-urlencoded
+  vars:
+    status: "{{ node_details.json.conditions | json_query(query) | first | default ('gg')  }}"
+    query: "[? type == 'Ready'].status"
   register: node_details
   with_items: "{{ nodes }}"
+  loop_control:
+    label: "{{ item.hostnameOverride }} {{item.nodeId }}"
+  until: status | bool
+  retries: "{{ ( addnic_wait_for_nodes_ready / 5 ) | int }}"
+  delay: 5

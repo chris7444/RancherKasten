@@ -16,5 +16,7 @@
 
 ---
 - import_playbook: playbooks/ucluster.yml
-#- import_playbook: playbooks/csi.yml
-#- import_playbook: playbooks/kasten.yml
+- import_playbook: playbooks/csi.yml
+- import_playbook: playbooks/addnic.yml
+  when: user_cluster.csi.driver == "nimble"
+- import_playbook: playbooks/kasten.yml

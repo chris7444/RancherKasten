@@ -12,10 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-###
-
+### 
 ---
-- import_playbook: playbooks/csi.yml
-- import_playbook: playbooks/addnic.yml
-  when: user_cluster.csi.driver == "nimble"
-- import_playbook: playbooks/kasten.yml
+addnic_wait_for_nodes_ready: 600  # wait 600 seconds for all cluster members to be ready
