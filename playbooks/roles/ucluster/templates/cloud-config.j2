@@ -1,4 +1,8 @@
 #cloud-config
+ntp:
+  enabled: true
+  servers: {{ ntp_servers }}
+
 users:
   - name: {{ ansible_user }}
     gecos: HPE Rancher on SimpliVity ansible account
@@ -6,6 +10,7 @@ users:
     sudo: ALL=(ALL) NOPASSWD:ALL
     ssh_authorized_keys:
       - {{ ssh_key }}
+
 {% if proxy is defined %}
 apt:
   http_proxy: {{ proxy.http }}
