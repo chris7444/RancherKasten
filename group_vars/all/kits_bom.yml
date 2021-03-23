@@ -29,8 +29,8 @@ kits_folder: "{{ lookup('env','HOME') }}/kits"
 #   The value / format of the version is used to form the URL which is used to download the component. There is no guarantee that
 #     the formatting of this URL will stay the same in the future.
 
-kits_rke_version: v1.2.5                 # 04-feb-2021
-kits_rancher_cli_version: v2.4.9
+kits_rke_version: v1.2.5                 # unresolved issuess with 1.2.6
+kits_rancher_cli_version: v2.4.10        # 22-mar-2021
 kits_kubectl_cli_version: v1.20.2
 kits_helm_cli_version: v3.5.1            # 04-feb-2021
 kits_harbor_version: v2.0.1              # only v2+ tested/supported
@@ -55,9 +55,9 @@ os_iso: "{% if packer_os_flavor is defined and packer_os_flavor == 'centos' %}{{
 
 kits_bom:
   minio:
-    url: "https://dl.minio.io/server/minio/release/linux-amd64/minio.RELEASE.2021-02-23T20-05-01Z"
-    hash: "sha256:9e59314f7364da8424ff6a9a5fabd44906af464dfbb262e00722c497646dfe40"
-    target: "{{ kits_folder }}/minio.RELEASE.2021-02-23T20-05-01Z"
+    url: "https://dl.min.io/server/minio/release/linux-amd64/archive/minio.RELEASE.2021-03-12T00-00-47Z"
+    hash: "sha256:d850841595509879cbb9bab3310b909e63408c8b94a644d0190b0a3c4c38e851"
+    target: "{{ kits_folder }}/minio.RELEASE.2021-03-12T00-00-47Z"
 
   nginxplus:
     url: "https://github.com/nginxinc/kubernetes-ingress/archive/{{ kits_nginxplus_version }}.tar.gz"
@@ -88,7 +88,7 @@ kits_bom:
 
   ranchercli:
     url:  https://github.com/rancher/cli/releases/download/{{ kits_rancher_cli_version }}/rancher-linux-amd64-{{ kits_rancher_cli_version }}.tar.gz
-    hash: "sha256:b289d979ee15e3c88675a48ed4de3b687d178c90a5d7b35463bdcdfe8743581a" 
+    hash: "sha256:81887743affea241c5d8ca768742260ff09f762ceaf41a728048522498e433a3"
     script: |
       cd {{ kits_folder }}
       tar -xvf rancher-linux-amd64-{{ kits_rancher_cli_version }}.tar.gz  ./rancher-{{ kits_rancher_cli_version }}/rancher
@@ -96,7 +96,8 @@ kits_bom:
 
   rkecli:
     url: https://github.com/rancher/rke/releases/download/{{ kits_rke_version }}/rke_linux-amd64
-    hash: "sha256:77d2dc6af0d9388cba7dddea9ce3339d8e99618a32da68d043018ef63840bc6f"        # checksum for v1.2.5
+#    hash: "sha256:6d4a44931cf2fddbac742b24a4172ecf41ab199eee047cb8fa598e15e45fff8c" # checksum for 1.2.6
+    hash: "sha256:77d2dc6af0d9388cba7dddea9ce3339d8e99618a32da68d043018ef63840bc6f" # checksum for 1.2.5
     script: |
       cd {{ kits_folder }}
       mv ./rke_linux-amd64 ./rke

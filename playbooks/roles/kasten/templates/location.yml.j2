@@ -1,0 +1,21 @@
+apiVersion: config.kio.kasten.io/v1alpha1
+kind: Profile
+metadata:
+  name: {{ kasten_location.name }}
+  namespace: kasten-io
+spec:
+  locationSpec:
+    credential:
+      secret:
+        apiVersion: v1
+        kind: secret
+        name: {{ kasten_location.secret.name }}
+        namespace: kasten-io
+      secretType: AwsAccessKey
+    objectStore:
+      endpoint: "{{ kasten_location.endpoint }}"
+      name: "{{ kasten_location.bucket }}"
+      objectStoreType: S3
+      skipSSLVerify: {{ kasten_location.skipSSLVerify | bool }}
+    type: ObjectStore
+  type: Location

@@ -71,3 +71,16 @@
     state: present
     kubeconfig: "{{ install_dir }}/kube_config.{{ user_cluster.name }}"
     definition: "{{ lookup('template','ingress.yml.j2') }}" 
+
+- name: Create a Secret for the S3 Object Store
+  k8s:
+    state: present
+    kubeconfig: "{{ install_dir }}/kube_config.{{ user_cluster.name }}"
+    definition: "{{ lookup('template','location-secret.yml.j2') }}" 
+
+- name: Produce the Location manifest for later consumption
+  template:
+    src: location.yml.j2
+    dest: "{{ install_dir }}/kasten-location.{{ user_cluster.name }}.yml"
+
+- debug: msg="Kasten Location manifest created {{ ':'}} {{ install_dir }}/kasten-location.{{ user_cluster.name }}.yml"

@@ -6,7 +6,7 @@ nodes:
     role: [controlplane, worker, etcd]
 {% endfor %}
 
-kubernetes_version: {{ user_cluster.kubernetesVersion }}
+kubernetes_version: {{ rke_cluster.kubernetesVersion }}
 
 services:
   etcd:

@@ -6,6 +6,7 @@
 cluster=$(kubectl config current-context)
 domain=k8s.org
 version="--version=2.5.25"
+#version=""
 
 #
 # Check Syntax

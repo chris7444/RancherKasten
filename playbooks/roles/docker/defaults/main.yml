@@ -14,4 +14,4 @@
 # limitations under the License.
 ###
 ---
-docker_install_script: 'https://releases.rancher.com/install-docker/19.03.sh'
+docker_install_script: 'https://releases.rancher.com/install-docker/20.10.sh'

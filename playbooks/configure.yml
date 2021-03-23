@@ -37,6 +37,8 @@
   gather_facts: yes
   roles:
   - role: docker
+    vars:
+      docker_install_script: "{{ rke_cluster.docker_url }}"
 
 #######################################################################
 #
