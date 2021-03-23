@@ -60,6 +60,10 @@ proxy:
   https:  "http://web-proxy.houston.hpecorp.net:8080/"
   except: "127.0.0.1,localhost,10.0.0.0/8,.k8s.org,.flab.local,.svc,.cluster.local"
 
+rke_cluster:
+  docker_url: https://releases.rancher.com/install-docker/19.03.sh      # 20.10 not supported by rke 1.2.5
+  kubernetesVersion: v1.18.15-rancher1-1                                # v1.20 unsupported for now
+
 rancher:
   url: https://rancher.k8s.org    # this the FQDN at which Rancher Server can be reached
   hostname: rancher.k8s.org       # generally same fqdn as the one in the url above but not necessarily
@@ -67,7 +71,7 @@ rancher:
 #  version: x.y.z.                # version of rancher server. defaults to 'latest' in rancher-stable
   validate_certs: False           #
   apiversion: v3                  # Playbooks designed for v3 of the API
-  engineInstallURL: 'https://releases.rancher.com/install-docker/19.03.sh'    # All node templates use the same version of Docker
+  engineInstallURL: 'https://releases.rancher.com/install-docker/20.10.sh'     # or 19.03.sh
 # If user supplied certificate wanted
 #  tls_source: secret                               # either rancher or secret, letsEncrypt unsupported (See doc), rancher is the default
 #  tls_privateCA: true                              # if using a private root CA, default is false (ie you use a public root CA)
@@ -79,10 +83,11 @@ usr_tag: "{% if lookup('env', 'USER_CLUSTER_TAG') == '' %}dev{% else %}{{ lookup
 user_cluster:
   name: "{{ usr_tag }}"                               # name of the user cluster
 # vm_template: kas-iscsi2-tpl                         # the default VM template is the admin template
-  kubernetesVersion: v1.18.15-rancher1-1              # v1.19 does not work with the default/generated template
+# kubernetesVersion: v1.18.15-rancher1-1              # tested with docker 19.03
+  kubernetesVersion: v1.20.4-rancher1-1               # v1.19 does not work with the default/generated template
   csi:
     driver: nimble                                    # nimble, vsphere or none
-    vsphere:                                          # relevant if driver is vspehere
+    vsphere:                                          # relevant if driver is vsphere
       datastore_name: cnstests                        # must exist
       storageclass_name: vsphere
       datastore_size: 20
@@ -168,5 +173,18 @@ registry:
 #  3- you may add additional CA certificates if needed
 #additional_cas:
 # - /home/alan/certs/registry/ca.crt
+
+
+kasten_location:
+  name: hpe-scality
+  endpoint: https://scality1-endpoint.flab.local
+  region: ""
+  bucket: kasten
+  skipSSLVerify: true
+  secret:
+    name: hpe-scality-secret
+    access_key: "{{ vault_s3_access_key }}"
+    secret_key: "{{ vault_s3_secret_key }}"
+
 
 delete_templates: false
