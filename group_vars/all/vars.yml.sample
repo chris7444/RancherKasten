@@ -15,20 +15,20 @@
 ###
 ---
 
-rancher_subnet: 16.78.0.0/19                       # subnet to use on the 'vm_portgroup' VLAN
-gateway: '16.78.0.1'                               # gateway for the above subnet (see your net admin)
-ntp_servers: ['16.110.135.123']                    # List of NTP servers
-dns_servers: ['16.78.15.31']                       # list of DNS servers
-dns_suffixes: ['k8s.org','flab.local']             # list of DNS suffixes
+rancher_subnet: 16.78.0.0/19                              # subnet to use on the 'vm_portgroup' VLAN
+gateway: '16.78.0.1'                                      # gateway for the above subnet (see your net admin)
+ntp_servers: ['16.110.135.123']                           # List of NTP servers
+dns_servers: ['16.78.15.31']                              # list of DNS servers
+dns_suffixes: ['k8s.org','flab.local']                    # list of DNS suffixes
+domain_name: k8s.org
 
 #
-# DHCP related settings
+# DHCP related settings, this github branch uses network profiles
 #
-dhcp_subnet: 10.5.62.0/24                          # subnet to use on the above VLAN (see your net admin)
-dhcp_range: '10.5.62.40 10.5.62.100'               # DHCP range to use on the above VLAN 
-dhcp_default_lease_time: 28800                     # DHCP default lease time (8 hours)
-dhcp_max_lease_time: 57600                         # DHCP maximum lease time (16 hours)
-domain_name: k8s.org
+#dhcp_subnet: 10.5.61.0/24                                # subnet to use on the above VLAN (see your net admin)
+#dhcp_range: '10.5.61.40 10.5.61.100'                     # DHCP range to use on the above VLAN 
+#dhcp_default_lease_time: 28800                           # DHCP default lease time (8 hours)
+#dhcp_max_lease_time: 57600                               # DHCP maximum lease time (16 hours)
 
 #
 # vcenter related settings
@@ -43,7 +43,6 @@ datacenter: DHCI                                          # Name of your DATACEN
 datastore: vmfs2                                          # Datastore where the VMs are landed (must exist)
 datastore_size: 1024                                      # size in GiB of the VM datastore
 cluster_name: rke                                         # Name of the K8S Cluster. A VM folder with the same name is created if needed
-iscsi1_portgroup: iSCSI2
 
 #
 # folders, templates and OVAs, templates are created using the corresponding OVA if they cannot be found (and only if they cannot be found)
@@ -60,15 +59,21 @@ proxy:
   https:  "http://web-proxy.houston.hpecorp.net:8080/"
   except: "127.0.0.1,localhost,10.0.0.0/8,.k8s.org,.flab.local,.svc,.cluster.local"
 
+#
+# Kubernetes cluster hosting the Rancher Server app
+#
 rke_cluster:
   docker_url: https://releases.rancher.com/install-docker/19.03.sh      # 20.10 not supported by rke 1.2.5
-  kubernetesVersion: v1.18.15-rancher1-1                                # v1.20 unsupported for now
+  kubernetesVersion: v1.18.15-rancher1-1                                # unresolved issues with v1.20 for now
 
+#
+# Rancher Server itself
+#
 rancher:
   url: https://rancher.k8s.org    # this the FQDN at which Rancher Server can be reached
   hostname: rancher.k8s.org       # generally same fqdn as the one in the url above but not necessarily
 #  channel: stable                # latest, stable or alpha, default 'stable'
-#  version: x.y.z.                # version of rancher server. defaults to 'latest' in rancher-stable
+#  version: x.y.z.                # version of rancher server. defaults to 'latest' in rancher-stable, last tested was 2.5.7
   validate_certs: False           #
   apiversion: v3                  # Playbooks designed for v3 of the API
   engineInstallURL: 'https://releases.rancher.com/install-docker/20.10.sh'     # or 19.03.sh
@@ -79,14 +84,22 @@ rancher:
 #  tls_certchain_file: /home/alan/certs/cachain.pem # file containing the server certificate followed by the intermediate CA certs (if any)
 #  tls_certkey_file: /home/alan/certs/tlskey.pem    # file containing the private key for the Rancher server
 
+#
+# usr_tag is a commodity, by configuring the env variable USER_CLUSTER_TAG you can easily
+#    re-run the playbook user.yml and deploy another user cluster in its own VM folder and resource pool
+#
 usr_tag: "{% if lookup('env', 'USER_CLUSTER_TAG') == '' %}dev{% else %}{{ lookup('env','USER_CLUSTER_TAG') }}{% endif %}"
+
+#
+# user cluster
+#
 user_cluster:
   name: "{{ usr_tag }}"                               # name of the user cluster
 # vm_template: kas-iscsi2-tpl                         # the default VM template is the admin template
-# kubernetesVersion: v1.18.15-rancher1-1              # tested with docker 19.03
-  kubernetesVersion: v1.20.4-rancher1-1               # v1.19 does not work with the default/generated template
+  kubernetesVersion: v1.20.4-rancher1-1               # last version I deployed successfully
+  iscsi1_portgroup: iSCSI2                            # if defined user VMs are connected to this portgroup
   csi:
-    driver: nimble                                    # nimble, vsphere or none
+    driver: vsphere                                   # nimble, vsphere or none
     vsphere:                                          # relevant if driver is vsphere
       datastore_name: cnstests                        # must exist
       storageclass_name: vsphere

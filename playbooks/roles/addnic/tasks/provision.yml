@@ -32,7 +32,7 @@
     state: present
     networks:
     - name: "{{ vm_portgroup }}"
-    - name: "{{ iscsi1_portgroup }}"
+    - name: "{{ user_cluster.iscsi1_portgroup }}"
   vars:
     uuid: "{{ item.json.providerId.split('/')[2] }}"
   with_items: "{{ node_details.results }}"
