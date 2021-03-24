@@ -99,7 +99,7 @@ user_cluster:
   kubernetesVersion: v1.20.4-rancher1-1               # last version I deployed successfully
   iscsi1_portgroup: iSCSI2                            # if defined user VMs are connected to this portgroup
   csi:
-    driver: vsphere                                   # nimble, vsphere or none
+    driver: nimble                                    # nimble, vsphere or none
     vsphere:                                          # relevant if driver is vsphere
       datastore_name: cnstests                        # must exist
       storageclass_name: vsphere
