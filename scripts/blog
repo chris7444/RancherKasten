@@ -1,0 +1,18 @@
+#!/bin/bash
+content=$(mktemp)
+cat <<EOF >${content}
+{
+  "title": "HPE Nimble and Kasten",
+  "content": "${fortune}",
+  "status": "publish"
+}
+EOF
+curl \
+  --user chris:foo \
+  http://wordpress.prod.k8s.org/wp-json/wp/v2/posts \
+  --data title="HPE Nimble and Kasten" \
+  --data status=publish \
+  --data content="$(/usr/games/fortune)"
+
+unlink ${content}
+#     --header "Accept: application/json" -H "Content-Type: application/json" \
