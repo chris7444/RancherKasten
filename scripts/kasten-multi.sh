@@ -7,16 +7,25 @@
 cat <<EOF
 cd /tmp
 wget https://github.com/kastenhq/external-tools/releases/download/3.0.10/k10multicluster_3.0.10_linux_amd64
-mv ./k10multicluster_3.0.10_linux_amd64 ./k10multicluster
-chmod +x k10multicluster
+sudo mv ./k10multicluster_3.0.10_linux_amd64 /usr/local/sbin/k10multicluster
+sudo chmod +x /usr/local/sbin/k10multicluster
+
 KUBECONFIG=~/.svtrancher/kube_config.cns \
-     ./k10multicluster setup-primary --name cns
+     k10multicluster setup-primary --name cns
+
 KUBECONFIG=~/.svtrancher/kube_config.cns \
-     ./k10multicluster bootstrap \
+     k10multicluster bootstrap \
      --primary-name=cns \
      --secondary-kubeconfig=/home/chris/.svtrancher/kube_config.clh \
      --secondary-name=clh \
      --secondary-cluster-ingress=https://kasten.clh.k8s.org/k10 \
      --secondary-cluster-ingress-tls-insecure=true \
+
+KUBECONFIG=~/.svtrancher/kube_config.cns \
+     k10multicluster remove \
+     --primary-name=cns \
+     --secondary-kubeconfig=/home/chris/.svtrancher/kube_config.clh \
+     --secondary-name=clh \
+
 EOF
 
