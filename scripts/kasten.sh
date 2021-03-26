@@ -10,7 +10,7 @@ if [[ "$1" == "latest" ]]
 then
   version=""
 else
-  version="--version=2.5.25"
+  version="--version=3.0.10"
 fi
 
 #
