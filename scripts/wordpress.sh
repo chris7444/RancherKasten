@@ -9,6 +9,13 @@ then
    echo Make sure KUBECONFIG points to a valid kubeconfig file
 fi
 domain=k8s.org
+if [[ "${MY_REGISTRY}" == "" ]]
+then
+  flag=""
+else
+  flag="--set global.imageRegistry=${MY_REGISTRY}"
+  echo using registry ${MY_REGISTRY}
+fi
 
 #
 # Check syntax
@@ -31,7 +38,7 @@ kubectl get ns wordpress >/dev/null 2>&1 || kubectl create ns wordpress
 iamthere=$(helm ls -n wordpress  -f '^wordpress$' -q)
 if [[ $iamthere != "wordpress" ]]
 then
-  helm install wordpress bitnami/wordpress -n wordpress --set wordpressPassword="$1" --set wordpressUsername=admin
+  helm install wordpress bitnami/wordpress -n wordpress --set wordpressPassword="$1" --set wordpressUsername=admin ${flag}
 else
   echo helm chart already installed
 fi

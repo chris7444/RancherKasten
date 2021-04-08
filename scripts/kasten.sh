@@ -6,11 +6,25 @@
 cluster=$(kubectl config current-context)
 domain=k8s.org
 
+#
+# Which container image registry do we want to use
+#
+if [[ "${MY_REGISTRY}" == "" ]]
+then 
+  flag=""
+else 
+  flag="--set global.airgapped.repository=${MY_REGISTRY}/kasten-images"
+  echo using registry ${MY_REGISTRY}/kasten-images
+fi
+
+#
+# Which version of Kasten
+#
 if [[ "$1" == "latest" ]]
 then
   version=""
 else
-  version="--version=3.0.10"
+  version="--version=3.0.11"
 fi
 
 #
@@ -36,7 +50,7 @@ if [[ "$iamthere" != "k10" ]]
 then
   helm repo add kasten https://charts.kasten.io/ >/dev/null 2>&1
   echo Deploying Kasten, this will take a few minutes before all services are up and running
-  helm install k10 kasten/k10 -n kasten-io --wait ${version}
+  helm install k10 kasten/k10 -n kasten-io --wait ${version} ${flag}
 else
   echo helm chart k10 already installed
 fi
@@ -62,6 +76,8 @@ kind: Ingress
 metadata:
   name: kasten
   namespace: kasten-io
+  annotations:
+    nginx.ingress.kubernetes.io/app-root: /k10/#
 spec:
   rules:
   - host: kasten.${cluster}.${domain}
