@@ -6,6 +6,6 @@ vault_harbor_admin_password: 'PasswordForPortalAdminUser'
 vault_harbor_db_password: 'PasswordForDB'
 vault_nimble_password: 'AdminPasswordForNimbleGroup'
 vault_minio_access_key: admin
-vault_minio_secret_key: 'Just4m$hpe'
+vault_minio_secret_key: 'YourSecretKey'
 vault_s3_access_key: 'youraccesskey'
 vault_s3_secret_key: 'yoursecretkey'
