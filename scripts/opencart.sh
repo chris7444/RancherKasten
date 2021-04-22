@@ -9,6 +9,13 @@ then
    echo Make sure KUBECONFIG points to a valid kubeconfig file
 fi
 domain=k8s.org
+if [[ "${MY_REGISTRY}" == "" ]]
+then
+  flag=""
+else
+  flag="--set global.imageRegistry=${MY_REGISTRY} --version=10.0.5"
+  echo using registry ${MY_REGISTRY}
+fi
 
 #
 # Check Syntax
@@ -31,10 +38,14 @@ kubectl get ns opencart >/dev/null 2>&1 || kubectl create ns opencart
 iamthere=$(helm ls -n opencart  -f '^opencart$' -q)
 if [[ "$iamthere" != "opencart" ]]
 then
-  helm install opencart bitnami/opencart -n opencart \
+  helm install opencart local-bitnami/opencart -n opencart \
         --set opencartHost=opencart.${cluster}.${domain} \
         --set opencartPassword="$1" \
-        --set opencartUsername=admin
+        --set opencartUsername=admin ${flag} \
+        --set ingress.enabled=true \
+        --set ingress.hostname=opencart.${cluster}.${domain} \
+        --set service.type=NodePort \
+        --wait
 else
   echo helm chart already installed
 fi
@@ -60,6 +71,6 @@ spec:
         path: /
         pathType: Prefix
 EOF
-kubectl apply -f ${manifest}
+#kubectl apply -f ${manifest}
 unlink ${manifest}
-kubectl get ingress opencart -n opencart
+#kubectl get ingress opencart -n opencart
