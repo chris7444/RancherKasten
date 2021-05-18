@@ -1,4 +1,9 @@
 #!/bin/bash
+# you need to 
+#  1- enable basic auth in the wordpress deployment first. I used this one: https://github.com/WP-API/Basic-Auth
+#  2- enable the plugin in wordpress
+#  3- create a user that can publish a new post (here chris, password foo)
+domain=${MY_DOMAIN:-hpe.org}
 content=$(mktemp)
 cat <<EOF >${content}
 {
@@ -9,7 +14,7 @@ cat <<EOF >${content}
 EOF
 curl \
   --user chris:foo \
-  http://wordpress.prod.k8s.org/wp-json/wp/v2/posts \
+  http://wordpress.prod.${domain}/wp-json/wp/v2/posts \
   --data title="HPE Nimble and Kasten" \
   --data status=publish \
   --data content="$(/usr/games/fortune)"

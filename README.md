@@ -18,8 +18,8 @@ rancher_subnet: 16.78.0.0/19
 vm_portgroup: DCN
 gateway: '16.78.0.1'
 dns_servers: ['16.78.15.31']
-dns_suffixes: ['k8s.org','flab.local']
-domain_name: k8s.org
+dns_suffixes: ['hpe.org','flab.local']
+domain_name: hpe.org
    :      :
 user_cluster:
    :       :

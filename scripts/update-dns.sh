@@ -9,7 +9,7 @@ then
   exit 1
 fi
 
-domain=k8s.org
+domain=${MY_DOMAIN:-hpe.org}
 dnsserver=${MY_DNS:-'10.5.61.1'}
 
 workernodes=($(kubectl get node -o wide | awk '/\sworker/ {print $6}'))

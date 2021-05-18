@@ -19,8 +19,8 @@ rancher_subnet: 16.78.0.0/19                              # subnet to use on the
 gateway: '16.78.0.1'                                      # gateway for the above subnet (see your net admin)
 ntp_servers: ['16.110.135.123']                           # List of NTP servers
 dns_servers: ['16.78.15.31']                              # list of DNS servers
-dns_suffixes: ['k8s.org','flab.local']                    # list of DNS suffixes
-domain_name: k8s.org
+dns_suffixes: ['hpe.org','flab.local']                    # list of DNS suffixes
+domain_name: hpe.org
 
 #
 # DHCP related settings, this github branch uses network profiles
@@ -57,7 +57,7 @@ ssh_key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDArNokIdAdYTP735ZJLhnbkhmHuRUQLZ
 proxy:
   http:   "http://web-proxy.houston.hpecorp.net:8080/"     #  http:  "http://user:password@10.12.7.21:8080/"
   https:  "http://web-proxy.houston.hpecorp.net:8080/"
-  except: "127.0.0.1,localhost,10.0.0.0/8,.k8s.org,.flab.local,.svc,.cluster.local"
+  except: "127.0.0.1,localhost,10.0.0.0/8,.hpe.org,.flab.local,.svc,.cluster.local"
 
 #
 # Kubernetes cluster hosting the Rancher Server app
@@ -70,8 +70,8 @@ rke_cluster:
 # Rancher Server itself
 #
 rancher:
-  url: https://rancher.k8s.org    # this the FQDN at which Rancher Server can be reached
-  hostname: rancher.k8s.org       # generally same fqdn as the one in the url above but not necessarily
+  url: https://rancher.hpe.org    # this the FQDN at which Rancher Server can be reached
+  hostname: rancher.hpe.org       # generally same fqdn as the one in the url above but not necessarily
 #  channel: stable                # latest, stable or alpha, default 'stable'
 #  version: x.y.z.                # version of rancher server. defaults to 'latest' in rancher-stable, last tested was 2.5.7
   validate_certs: False           #
@@ -170,7 +170,7 @@ registry:
 #  tls_cacert_file: /home/alan/certs/registry/ca.crt
 #  tls_certchain_file: /home/alan/certs/registry/registry-cachain.pem
 #  tls_certkey_file: /home/alan/certs/registry/registry-key.pem
-  fqdn: registry.k8s.org
+  fqdn: registry.hpe.org
   projects:
   - project_name:  nginxplus
     is_public: false

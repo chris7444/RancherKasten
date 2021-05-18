@@ -29,7 +29,7 @@ kits_folder: "{{ lookup('env','HOME') }}/kits"
 #   The value / format of the version is used to form the URL which is used to download the component. There is no guarantee that
 #     the formatting of this URL will stay the same in the future.
 
-kits_rke_version: v1.2.5                 # unresolved issuess with 1.2.6
+kits_rke_version: v1.2.7                 # unresolved issuess with 1.2.6
 kits_rancher_cli_version: v2.4.10        # 22-mar-2021
 kits_kubectl_cli_version: v1.20.2
 kits_helm_cli_version: v3.5.1            # 04-feb-2021
@@ -38,8 +38,11 @@ kits_compose_version: 1.26.0
 kits_nginxplus_version: v1.7.2
 
 ubuntu_iso:
+#  url: "http://cdimage.ubuntu.com/ubuntu-legacy-server/releases/20.04/release/ubuntu-20.04.1-legacy-server-amd64.iso"
+#  hash: "sha256:f11bda2f2caed8f420802b59f382c25160b114ccc665dbac9c5046e7fceaced2"
   url: "http://cdimage.ubuntu.com/releases/18.04/release/ubuntu-18.04.5-server-amd64.iso"
   hash: "sha256:8c5fc24894394035402f66f3824beb7234b757dd2b5531379cb310cedfdf0996"
+
 
 centos_everything_iso:
   url: "http://centos.mirror.constant.com/7.8.2003/isos/x86_64/CentOS-7-x86_64-Everything-2003.iso"
@@ -97,7 +100,8 @@ kits_bom:
   rkecli:
     url: https://github.com/rancher/rke/releases/download/{{ kits_rke_version }}/rke_linux-amd64
 #    hash: "sha256:6d4a44931cf2fddbac742b24a4172ecf41ab199eee047cb8fa598e15e45fff8c" # checksum for 1.2.6
-    hash: "sha256:77d2dc6af0d9388cba7dddea9ce3339d8e99618a32da68d043018ef63840bc6f" # checksum for 1.2.5
+#    hash: "sha256:77d2dc6af0d9388cba7dddea9ce3339d8e99618a32da68d043018ef63840bc6f" # checksum for 1.2.5
+    hash: "sha256:e84b54da40e7e53cfd5cb3933c6aab9f027e14c39c1a0d29f90479bf3f8feeff" # checksum for 1.2.7
     script: |
       cd {{ kits_folder }}
       mv ./rke_linux-amd64 ./rke

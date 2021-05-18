@@ -17,4 +17,4 @@ rm ${values}
 cd ~
 [ -d test_db ] || git clone https://github.com/datacharmer/test_db
 cd test_db
-kubectl -n mariadb port-forward service/mydb-mariadb 3306:3306 &
+#kubectl -n mariadb port-forward service/mydb-mariadb 3306:3306 &

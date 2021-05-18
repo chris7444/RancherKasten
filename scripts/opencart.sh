@@ -8,7 +8,7 @@ if [[ $? != 0 ]]
 then
    echo Make sure KUBECONFIG points to a valid kubeconfig file
 fi
-domain=k8s.org
+domain=${MY_DOMAIN:-hpe.org}
 if [[ "${MY_REGISTRY}" == "" ]]
 then
   flag=""

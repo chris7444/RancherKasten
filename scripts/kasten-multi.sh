@@ -24,7 +24,7 @@ then
   exit 0
 fi
 
-domain=k8s.org
+domain=${MY_DOMAIN:-hpe.org}
 cluster=$(kubectl config current-context)
 if [[ $? != 0 ]]
 then

@@ -8,7 +8,7 @@
 #
 . ~/proxy.rc
 cluster=$(kubectl config current-context)
-domain=k8s.org
+domain=${MY_DOMAIN:-hpe.org}
 
 #
 # Which container image registry do we want to use
