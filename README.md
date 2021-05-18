@@ -72,6 +72,6 @@ Finally, If you want to access the apps you deploy in the user clusters you will
 
 In this example, the wildcard DNS was created to resolve with the IP address of the first (and only) worker node in the cluster
 
-![image-20210324152041198](pics/widlcard-dns-worker-nodes)
+![image-20210324152041198](pics/wildcard-dns-worker-nodes.png)
 
-![image-20210324151842532](pics/widlcard-dns)
+![image-20210324151842532](pics/wildcard-dns.png)
